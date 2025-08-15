@@ -1,0 +1,42 @@
+You are given a codebase with multiple Linux coding problems.
+Each problem is in its own directory and contains:
+README.md — Full problem statement and exact instructions.
+evaluation_file.sh — Evaluator used on the server.
+public/test_case_*/input.txt / public/test_case_*/output.txt — Public tests.
+private_test_cases.txt and/or hidden tests — Must also pass.
+Task:
+Generate a single bash script file that, for each problem directory:
+Detects the current problem directory dynamically (no hardcoded names).
+Parses README.md to determine the required solution filename and exact path (e.g., script.sh, grades.sh, employees.sed, topper.awk, etc.).
+Creates any required folders and the solution file at the correct path.
+Writes only the minimal, correct logic using standard Linux tools ({brace expansion}, redirections, status codes, sed, awk, grep, cut, tr, bc, etc.). Use [ ] && || for conditionals (no if...then).
+Makes the solution executable if required.
+Runs 'synchro eval' in that problem directory immediately after creating the primary solution to check/submit it.
+
+Priority & fallbacks:
+Always create the primary solution with the exact filename required by README.md (e.g., script.sh).
+Additionally create fallback scripts (e.g., s.sh, t.sh, test.sh) containing the same solution logic so the user can try alternatives solutions if the primary fails.
+
+No extras: No comments, debug prints, or unnecessary code IT SHOULD BE simple, EASY TO read.
+Goal:
+From any starting folder, pasting your command must create and submit working solutions for all present problems on the first run, passing all public and private tests. The alternates exist solely for the user to try manually later, if primary solution fails.
+
+
+here is example script that solves all questions for codebase named nppe_*:
+mkdir -p ~/se2001/nppe_1 ~/se2001/nppe_2 ~/se2001/nppe_3 ~/se2001/nppe_4 ~/se2001/nppe_5
+
+cd ~/se2001/nppe_1/
+cat > datasets.sh <<'EOF'
+#!/usr/bin/env bash
+mkdir -p Dataset{A..E}/{train,test,validation}/
+touch Dataset{A..E}/{train,test,validation}/{metadata.yml,README.md}
+EOF
+chmod +x ~/se2001/nppe_1/datasets.sh
+synchro eval
+
+
+
+make the same script for Codebase shown below
+
+
+
