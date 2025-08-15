@@ -1,0 +1,1329 @@
+# Directory Structure
+```
+nppe_1/evaluation_file.sh
+nppe_1/public/test_case_1/output.txt
+nppe_1/README.md
+nppe_2/evaluation_file.sh
+nppe_2/private_test_cases.txt
+nppe_2/public/test_case_1/input.txt
+nppe_2/public/test_case_1/output.txt
+nppe_2/public/test_case_2/input.txt
+nppe_2/public/test_case_2/output.txt
+nppe_2/README.md
+nppe_3/evaluation_file.sh
+nppe_3/private_test_cases.txt
+nppe_3/public/test_case_1/input.txt
+nppe_3/public/test_case_1/output.txt
+nppe_3/public/test_case_2/input.txt
+nppe_3/public/test_case_2/output.txt
+nppe_3/README.md
+nppe_4/evaluation_file.sh
+nppe_4/private_test_cases.txt
+nppe_4/public/test_case_1/input.txt
+nppe_4/public/test_case_1/output.txt
+nppe_4/public/test_case_2/input.txt
+nppe_4/public/test_case_2/output.txt
+nppe_4/README.md
+nppe_5/evaluation_file.sh
+nppe_5/private_test_cases.txt
+nppe_5/public/test_case_1/input.txt
+nppe_5/public/test_case_1/output.txt
+nppe_5/README.md
+README.md
+repomix-output.md
+sample/evaluation_file.sh
+sample/hello.txt
+sample/private_test_cases.txt
+sample/README.md
+sample/script.sh
+```
+
+# Files
+
+## File: nppe_1/evaluation_file.sh
+`````bash
+#!/usr/bin/env bash
+passed_tests=0
+total_tests=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+./datasets.sh >/dev/null
+find Dataset* | sort
+EOF
+chmod u+x script.sh
+if [[ ! -e datasets.sh ]]; then
+  echo "datasets.sh not found!"
+  exit 1
+fi
+if [[ ! -x datasets.sh ]]; then
+  echo "datasets.sh is not executable!"
+  exit 1
+fi
+for test_case in $(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case_*" | sort); do
+  echo "${test_case}"
+  if diff --color=always -u <(./script.sh < "$test_case/input.txt" | col ) <( col < "$test_case/output.txt" ); then
+    ((passed_tests++))
+  fi
+  ((total_tests++))
+done
+echo "Passed tests: $passed_tests/$total_tests"
+if [ "$passed_tests" -ne "$total_tests" ]; then
+    exit 1
+fi
+`````
+
+## File: nppe_1/public/test_case_1/output.txt
+`````
+DatasetA
+DatasetA/test
+DatasetA/test/README.md
+DatasetA/test/metadata.yml
+DatasetA/train
+DatasetA/train/README.md
+DatasetA/train/metadata.yml
+DatasetA/validation
+DatasetA/validation/README.md
+DatasetA/validation/metadata.yml
+DatasetB
+DatasetB/test
+DatasetB/test/README.md
+DatasetB/test/metadata.yml
+DatasetB/train
+DatasetB/train/README.md
+DatasetB/train/metadata.yml
+DatasetB/validation
+DatasetB/validation/README.md
+DatasetB/validation/metadata.yml
+DatasetC
+DatasetC/test
+DatasetC/test/README.md
+DatasetC/test/metadata.yml
+DatasetC/train
+DatasetC/train/README.md
+DatasetC/train/metadata.yml
+DatasetC/validation
+DatasetC/validation/README.md
+DatasetC/validation/metadata.yml
+DatasetD
+DatasetD/test
+DatasetD/test/README.md
+DatasetD/test/metadata.yml
+DatasetD/train
+DatasetD/train/README.md
+DatasetD/train/metadata.yml
+DatasetD/validation
+DatasetD/validation/README.md
+DatasetD/validation/metadata.yml
+DatasetE
+DatasetE/test
+DatasetE/test/README.md
+DatasetE/test/metadata.yml
+DatasetE/train
+DatasetE/train/README.md
+DatasetE/train/metadata.yml
+DatasetE/validation
+DatasetE/validation/README.md
+DatasetE/validation/metadata.yml
+`````
+
+## File: nppe_1/README.md
+`````markdown
+# NPPE Problem 1
+
+## Problem Statement
+
+A data scientist wishes to train image classification models based on 5 different datasets. These are named from `DatasetA` to `DatasetE`. There are three categories of image files within each dataset, namely `train`, `test` and `validation`. Before downloading the images, the directory structure needs to be created.
+
+Write a bash script to create the directories for the datasets. Within each dataset directory, create subdirectories for `train`, `test`, and `validation`. In each subdirectory, create two empty files named `metadata.yml` and `README.md`.
+
+The directory structure should be the following after running the script.
+
+```bash
+.
+├── DatasetA
+│   ├── test
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   ├── train
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   └── validation
+│       ├── README.md
+│       └── metadata.yml
+├── DatasetB
+│   ├── test
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   ├── train
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   └── validation
+│       ├── README.md
+│       └── metadata.yml
+├── DatasetC
+| # ...
+```
+
+## Instructions
+
+- Your script should be named `datasets.sh`.
+- It should be present in `~/se2001/nppe_1/`.
+- It should create the files `metadata.yml` and `README.md` as described in the problem statement.
+- The files should be empty.
+- It should not output anything to the console.
+- If you want to print something for debugging purposes, write to a file or to the standard error stream.
+`````
+
+## File: nppe_2/evaluation_file.sh
+`````bash
+#!/usr/bin/env bash
+if [[ ! -e script.sh ]]; then
+  echo "script.sh not found!" >&2
+  exit 1
+fi
+if [[ ! -x script.sh ]]; then
+  echo "script.sh is not executable!" >&2
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u <(./script.sh <"$test_case/input.txt" | col) <(col <"$test_case/output.txt") --color=always ; then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+  exit 1
+fi
+`````
+
+## File: nppe_2/private_test_cases.txt
+`````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+private/test_case_5
+`````
+
+## File: nppe_2/public/test_case_1/input.txt
+`````
+<li>Item: <span class="item-name">Batteries</span>, Price: <span class="item-price">Rs. 14</span>, Qty: <span class="item-qty">6</span></li>
+<li>Item: <span class="item-name">USB Cable</span>, Price: <span class="item-price">Rs. 85</span>, Qty: <span class="item-qty">1</span></li>
+<li>Item: <span class="item-name">Ball Pens</span>, Price: <span class="item-price">Rs. 12</span>, Qty: <span class="item-qty">5</span></li>
+`````
+
+## File: nppe_2/public/test_case_1/output.txt
+`````
+229
+`````
+
+## File: nppe_2/public/test_case_2/input.txt
+`````
+<li>Item: <span class="item-name">Whiteboard Markers</span>, Price: <span class="item-price">Rs. 70</span>, Qty: <span class="item-qty">2</span></li>
+<li>Item: <span class="item-name">Chalk</span>, Price: <span class="item-price">Rs. 8</span>, Qty: <span class="item-qty">12</span></li>
+<li>Item: <span class="item-name">Clipboard</span>, Price: <span class="item-price">Rs. 25</span>, Qty: <span class="item-qty">3</span></li>
+<li>Item: <span class="item-name">Pencil Case</span>, Price: <span class="item-price">Rs. 45</span>, Qty: <span class="item-qty">2</span></li>
+`````
+
+## File: nppe_2/public/test_case_2/output.txt
+`````
+401
+`````
+
+## File: nppe_2/README.md
+`````markdown
+# NPPE Problem 2
+
+## Problem Statement
+
+You have been provided with a list of items of a shopping bill in HTML. The list has name of the item, price, and quantity. Write a **bash script** `script.sh` to compute the total bill amount.
+
+**Note**:  
+The HTML input to the script will be sent through standard input (`&0`).
+
+## Sample Input
+
+```html
+<li>Item: <span class="item-name">Batteries</span>, Price: <span class="item-price">Rs. 14</span>, Qty: <span class="item-qty">6</span></li>
+<li>Item: <span class="item-name">USB Cable</span>, Price: <span class="item-price">Rs. 85</span>, Qty: <span class="item-qty">1</span></li>
+<li>Item: <span class="item-name">Ball Pens</span>, Price: <span class="item-price">Rs. 12</span>, Qty: <span class="item-qty">5</span></li>
+```
+
+## Sample Output
+
+```bash
+229
+```
+
+## Instructions
+
+- You should create a bash script named `script.sh`.
+- It should be present in `~/se2001/nppe_2/` directory.
+- The script should read the HTML input from standard input (`&0`).
+- The script should output the required format to standard output (`&1`).
+`````
+
+## File: nppe_3/evaluation_file.sh
+`````bash
+#!/usr/bin/env bash
+if [[ ! -e grades.sh ]]; then
+  echo "grades.sh not found!"
+  exit 1
+fi
+if [[ ! -x grades.sh ]]; then
+  echo "grades.sh is not executable!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+tempd=\$(mktemp -d XXXXXX)
+mkdir -p "\$tempd"
+trap 'rm -rf \$tempd' EXIT
+pushd "\$tempd" > /dev/null || exit 1
+cat > results.csv
+../grades.sh 2>&1 </dev/null
+popd > /dev/null || exit 1
+rm -rf "\$tempd"
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+`````
+
+## File: nppe_3/private_test_cases.txt
+`````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+`````
+
+## File: nppe_3/public/test_case_1/input.txt
+`````
+RollNo,Name,Marks
+101,Clarence,63
+102,Naveen,72
+103,Rahul,97
+104,Sameer,81
+`````
+
+## File: nppe_3/public/test_case_1/output.txt
+`````
+Clarence: C
+Naveen: B
+Rahul: S
+Sameer: A
+`````
+
+## File: nppe_3/public/test_case_2/input.txt
+`````
+RollNo,Name,Marks
+301,Kumar,85
+302,Sachin,90
+303,George,78
+304,Deepika,95
+`````
+
+## File: nppe_3/public/test_case_2/output.txt
+`````
+Kumar: A
+Sachin: S
+George: B
+Deepika: S
+`````
+
+## File: nppe_3/README.md
+`````markdown
+# NPPE Problem 3
+
+## Problem Statement
+
+Write a bash script `grades.sh` that reads a CSV file `results.csv` present in the current working directory containing student results with columns `RollNo,Name,Marks`. Compute the grade of a student using the following rules:
+
+- If `Marks` is less than 50, grade is `U`.
+- If `Marks` is greater than or equal to 50, but less than 60, grade is `D`.
+- If `Marks` is greater than or equal to 60, but less than 70, grade is `C`.
+- If `Marks` is greater than or equal to 70, but less than 80, grade is `B`.
+- If `Marks` is greater than or equal to 80, but less than 90, grade is `A`.
+- If `Marks` is greater than or equal to 90, grade is `S`.
+
+Print the names of students along with their grades.
+
+## Sample Input
+
+```
+RollNo,Name,Marks
+101,Clarence,63
+102,Naveen,72
+103,Rahul,97
+104,Sameer,81
+```
+
+## Sample Output
+
+```
+Clarence: C
+Naveen: B
+Rahul: S
+Sameer: A
+```
+
+## Instructions
+
+- Assume that the `results.csv` is present in the current working directory.  
+- Write your script in `grades.sh`.
+- It should be present in `~/se2001/nppe_3/` directory.
+- The script should output the result to the standard output (`&1`).
+`````
+
+## File: nppe_4/evaluation_file.sh
+`````bash
+#!/usr/bin/env bash
+if [[ ! -e employees.sed ]]; then
+  echo "employees.sed not found!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+sed -nf ./employees.sed 2>&1 
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+`````
+
+## File: nppe_4/private_test_cases.txt
+`````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+`````
+
+## File: nppe_4/public/test_case_1/input.txt
+`````
+Rahul, 30, Developer
+Emily, 25, Designer
+Amit, 28, Manager
+Sarah, 35, Developer
+James, 32, Designer
+`````
+
+## File: nppe_4/public/test_case_1/output.txt
+`````
+Rahul, Senior Developer
+Emily, Designer
+Amit, Manager
+Sarah, Senior Developer
+James, Designer
+`````
+
+## File: nppe_4/public/test_case_2/input.txt
+`````
+Michael, 40, Project Manager
+Anjali, 29, QA Engineer
+Rohit, 33, Developer
+George, 27, UX Designer
+Karan, 31, Data Analyst
+`````
+
+## File: nppe_4/public/test_case_2/output.txt
+`````
+Michael, Project Manager
+Anjali, QA Engineer
+Rohit, Senior Developer
+George, UX Designer
+Karan, Data Analyst
+`````
+
+## File: nppe_4/README.md
+`````markdown
+# NPPE Problem 4
+
+## Problem Statement
+
+Write a `sed` script named `employees.sed` to change the job title "Developer" to "Senior Developer", and remove age information from all records.
+
+## Sample Input
+
+```
+Rahul, 30, Developer
+Emily, 25, Designer
+Amit, 28, Manager
+Sarah, 35, Developer
+James, 32, Designer
+```
+
+## Sample Output
+
+```
+Rahul, Senior Developer
+Emily, Designer
+Amit, Manager
+Sarah, Senior Developer
+James, Designer
+```
+
+## Instructions
+
+- The script must be a `sed` script and not a bash script.
+- It should be present in `~/se2001/nppe_4/` directory.
+- Format the output strictly as shown in the example.
+- Your sed script is run as follows:
+
+```bash
+sed -nf employees.sed < inputfile
+```
+`````
+
+## File: nppe_5/evaluation_file.sh
+`````bash
+#!/usr/bin/env bash
+if [[ ! -e topper.awk ]]; then
+  echo "topper.awk not found!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+gawk -nf ./topper.awk 2>&1 
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+`````
+
+## File: nppe_5/private_test_cases.txt
+`````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+`````
+
+## File: nppe_5/public/test_case_1/input.txt
+`````
+Name	Math	Science English
+Maya	80	85	78
+Shreya	90	92	88
+Ananya	75	80	70
+Olivia	88	86	84
+Michael	82	79	85
+`````
+
+## File: nppe_5/public/test_case_1/output.txt
+`````
+Topper: Shreya
+`````
+
+## File: nppe_5/README.md
+`````markdown
+# NPPE Problem 5
+
+## Problem Statement
+
+You have a tab separated values (TSV) file that contains the scores of students in various subjects.
+
+Write an `awk` script named `topper.awk` that will calculate the average score for each student across all subjects.
+
+Assume that there are no ties in the average score.
+
+Identify the student with the highest average score and print their name.
+
+## **Sample Input**
+
+```tsv
+Name  Math  Science English
+Maya  80  85  78
+Shreya 90  92  88
+Ananya  75  80  70
+Olivia  88  86  84
+Michael 82  79  85
+```
+
+## **Sample Output**
+
+```txt
+Topper: Shreya
+```
+
+## Instructions
+
+- Your `awk` script should be saved in a file named `topper.awk`.
+- It should be present in `~/se2001/nppe_5/` directory.
+- Format the output strictly as shown in the example.
+- The awk script will be run as follows:
+
+```bash
+gawk -f topper.awk input-file
+```
+
+or
+
+```bash
+gawk -f topper.awk < input-file
+```
+`````
+
+## File: README.md
+`````markdown
+To be filled
+`````
+
+## File: repomix-output.md
+`````markdown
+# Directory Structure
+```
+nppe_1/evaluation_file.sh
+nppe_1/public/test_case_1/output.txt
+nppe_1/README.md
+nppe_2/evaluation_file.sh
+nppe_2/private_test_cases.txt
+nppe_2/public/test_case_1/input.txt
+nppe_2/public/test_case_1/output.txt
+nppe_2/public/test_case_2/input.txt
+nppe_2/public/test_case_2/output.txt
+nppe_2/README.md
+nppe_3/evaluation_file.sh
+nppe_3/private_test_cases.txt
+nppe_3/public/test_case_1/input.txt
+nppe_3/public/test_case_1/output.txt
+nppe_3/public/test_case_2/input.txt
+nppe_3/public/test_case_2/output.txt
+nppe_3/README.md
+nppe_4/evaluation_file.sh
+nppe_4/private_test_cases.txt
+nppe_4/public/test_case_1/input.txt
+nppe_4/public/test_case_1/output.txt
+nppe_4/public/test_case_2/input.txt
+nppe_4/public/test_case_2/output.txt
+nppe_4/README.md
+nppe_5/evaluation_file.sh
+nppe_5/private_test_cases.txt
+nppe_5/public/test_case_1/input.txt
+nppe_5/public/test_case_1/output.txt
+nppe_5/README.md
+README.md
+sample/evaluation_file.sh
+sample/hello.txt
+sample/private_test_cases.txt
+sample/README.md
+sample/script.sh
+```
+
+# Files
+
+## File: nppe_1/evaluation_file.sh
+````bash
+#!/usr/bin/env bash
+passed_tests=0
+total_tests=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+./datasets.sh >/dev/null
+find Dataset* | sort
+EOF
+chmod u+x script.sh
+if [[ ! -e datasets.sh ]]; then
+  echo "datasets.sh not found!"
+  exit 1
+fi
+if [[ ! -x datasets.sh ]]; then
+  echo "datasets.sh is not executable!"
+  exit 1
+fi
+for test_case in $(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case_*" | sort); do
+  echo "${test_case}"
+  if diff --color=always -u <(./script.sh < "$test_case/input.txt" | col ) <( col < "$test_case/output.txt" ); then
+    ((passed_tests++))
+  fi
+  ((total_tests++))
+done
+echo "Passed tests: $passed_tests/$total_tests"
+if [ "$passed_tests" -ne "$total_tests" ]; then
+    exit 1
+fi
+````
+
+## File: nppe_1/public/test_case_1/output.txt
+````
+DatasetA
+DatasetA/test
+DatasetA/test/README.md
+DatasetA/test/metadata.yml
+DatasetA/train
+DatasetA/train/README.md
+DatasetA/train/metadata.yml
+DatasetA/validation
+DatasetA/validation/README.md
+DatasetA/validation/metadata.yml
+DatasetB
+DatasetB/test
+DatasetB/test/README.md
+DatasetB/test/metadata.yml
+DatasetB/train
+DatasetB/train/README.md
+DatasetB/train/metadata.yml
+DatasetB/validation
+DatasetB/validation/README.md
+DatasetB/validation/metadata.yml
+DatasetC
+DatasetC/test
+DatasetC/test/README.md
+DatasetC/test/metadata.yml
+DatasetC/train
+DatasetC/train/README.md
+DatasetC/train/metadata.yml
+DatasetC/validation
+DatasetC/validation/README.md
+DatasetC/validation/metadata.yml
+DatasetD
+DatasetD/test
+DatasetD/test/README.md
+DatasetD/test/metadata.yml
+DatasetD/train
+DatasetD/train/README.md
+DatasetD/train/metadata.yml
+DatasetD/validation
+DatasetD/validation/README.md
+DatasetD/validation/metadata.yml
+DatasetE
+DatasetE/test
+DatasetE/test/README.md
+DatasetE/test/metadata.yml
+DatasetE/train
+DatasetE/train/README.md
+DatasetE/train/metadata.yml
+DatasetE/validation
+DatasetE/validation/README.md
+DatasetE/validation/metadata.yml
+````
+
+## File: nppe_1/README.md
+````markdown
+# NPPE Problem 1
+
+## Problem Statement
+
+A data scientist wishes to train image classification models based on 5 different datasets. These are named from `DatasetA` to `DatasetE`. There are three categories of image files within each dataset, namely `train`, `test` and `validation`. Before downloading the images, the directory structure needs to be created.
+
+Write a bash script to create the directories for the datasets. Within each dataset directory, create subdirectories for `train`, `test`, and `validation`. In each subdirectory, create two empty files named `metadata.yml` and `README.md`.
+
+The directory structure should be the following after running the script.
+
+```bash
+.
+├── DatasetA
+│   ├── test
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   ├── train
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   └── validation
+│       ├── README.md
+│       └── metadata.yml
+├── DatasetB
+│   ├── test
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   ├── train
+│   │   ├── README.md
+│   │   └── metadata.yml
+│   └── validation
+│       ├── README.md
+│       └── metadata.yml
+├── DatasetC
+| # ...
+```
+
+## Instructions
+
+- Your script should be named `datasets.sh`.
+- It should be present in `~/se2001/nppe_1/`.
+- It should create the files `metadata.yml` and `README.md` as described in the problem statement.
+- The files should be empty.
+- It should not output anything to the console.
+- If you want to print something for debugging purposes, write to a file or to the standard error stream.
+````
+
+## File: nppe_2/evaluation_file.sh
+````bash
+#!/usr/bin/env bash
+if [[ ! -e script.sh ]]; then
+  echo "script.sh not found!" >&2
+  exit 1
+fi
+if [[ ! -x script.sh ]]; then
+  echo "script.sh is not executable!" >&2
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u <(./script.sh <"$test_case/input.txt" | col) <(col <"$test_case/output.txt") --color=always ; then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+  exit 1
+fi
+````
+
+## File: nppe_2/private_test_cases.txt
+````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+private/test_case_5
+````
+
+## File: nppe_2/public/test_case_1/input.txt
+````
+<li>Item: <span class="item-name">Batteries</span>, Price: <span class="item-price">Rs. 14</span>, Qty: <span class="item-qty">6</span></li>
+<li>Item: <span class="item-name">USB Cable</span>, Price: <span class="item-price">Rs. 85</span>, Qty: <span class="item-qty">1</span></li>
+<li>Item: <span class="item-name">Ball Pens</span>, Price: <span class="item-price">Rs. 12</span>, Qty: <span class="item-qty">5</span></li>
+````
+
+## File: nppe_2/public/test_case_1/output.txt
+````
+229
+````
+
+## File: nppe_2/public/test_case_2/input.txt
+````
+<li>Item: <span class="item-name">Whiteboard Markers</span>, Price: <span class="item-price">Rs. 70</span>, Qty: <span class="item-qty">2</span></li>
+<li>Item: <span class="item-name">Chalk</span>, Price: <span class="item-price">Rs. 8</span>, Qty: <span class="item-qty">12</span></li>
+<li>Item: <span class="item-name">Clipboard</span>, Price: <span class="item-price">Rs. 25</span>, Qty: <span class="item-qty">3</span></li>
+<li>Item: <span class="item-name">Pencil Case</span>, Price: <span class="item-price">Rs. 45</span>, Qty: <span class="item-qty">2</span></li>
+````
+
+## File: nppe_2/public/test_case_2/output.txt
+````
+401
+````
+
+## File: nppe_2/README.md
+````markdown
+# NPPE Problem 2
+
+## Problem Statement
+
+You have been provided with a list of items of a shopping bill in HTML. The list has name of the item, price, and quantity. Write a **bash script** `script.sh` to compute the total bill amount.
+
+**Note**:  
+The HTML input to the script will be sent through standard input (`&0`).
+
+## Sample Input
+
+```html
+<li>Item: <span class="item-name">Batteries</span>, Price: <span class="item-price">Rs. 14</span>, Qty: <span class="item-qty">6</span></li>
+<li>Item: <span class="item-name">USB Cable</span>, Price: <span class="item-price">Rs. 85</span>, Qty: <span class="item-qty">1</span></li>
+<li>Item: <span class="item-name">Ball Pens</span>, Price: <span class="item-price">Rs. 12</span>, Qty: <span class="item-qty">5</span></li>
+```
+
+## Sample Output
+
+```bash
+229
+```
+
+## Instructions
+
+- You should create a bash script named `script.sh`.
+- It should be present in `~/se2001/nppe_2/` directory.
+- The script should read the HTML input from standard input (`&0`).
+- The script should output the required format to standard output (`&1`).
+````
+
+## File: nppe_3/evaluation_file.sh
+````bash
+#!/usr/bin/env bash
+if [[ ! -e grades.sh ]]; then
+  echo "grades.sh not found!"
+  exit 1
+fi
+if [[ ! -x grades.sh ]]; then
+  echo "grades.sh is not executable!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+tempd=\$(mktemp -d XXXXXX)
+mkdir -p "\$tempd"
+trap 'rm -rf \$tempd' EXIT
+pushd "\$tempd" > /dev/null || exit 1
+cat > results.csv
+../grades.sh 2>&1 </dev/null
+popd > /dev/null || exit 1
+rm -rf "\$tempd"
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+````
+
+## File: nppe_3/private_test_cases.txt
+````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+````
+
+## File: nppe_3/public/test_case_1/input.txt
+````
+RollNo,Name,Marks
+101,Clarence,63
+102,Naveen,72
+103,Rahul,97
+104,Sameer,81
+````
+
+## File: nppe_3/public/test_case_1/output.txt
+````
+Clarence: C
+Naveen: B
+Rahul: S
+Sameer: A
+````
+
+## File: nppe_3/public/test_case_2/input.txt
+````
+RollNo,Name,Marks
+301,Kumar,85
+302,Sachin,90
+303,George,78
+304,Deepika,95
+````
+
+## File: nppe_3/public/test_case_2/output.txt
+````
+Kumar: A
+Sachin: S
+George: B
+Deepika: S
+````
+
+## File: nppe_3/README.md
+````markdown
+# NPPE Problem 3
+
+## Problem Statement
+
+Write a bash script `grades.sh` that reads a CSV file `results.csv` present in the current working directory containing student results with columns `RollNo,Name,Marks`. Compute the grade of a student using the following rules:
+
+- If `Marks` is less than 50, grade is `U`.
+- If `Marks` is greater than or equal to 50, but less than 60, grade is `D`.
+- If `Marks` is greater than or equal to 60, but less than 70, grade is `C`.
+- If `Marks` is greater than or equal to 70, but less than 80, grade is `B`.
+- If `Marks` is greater than or equal to 80, but less than 90, grade is `A`.
+- If `Marks` is greater than or equal to 90, grade is `S`.
+
+Print the names of students along with their grades.
+
+## Sample Input
+
+```
+RollNo,Name,Marks
+101,Clarence,63
+102,Naveen,72
+103,Rahul,97
+104,Sameer,81
+```
+
+## Sample Output
+
+```
+Clarence: C
+Naveen: B
+Rahul: S
+Sameer: A
+```
+
+## Instructions
+
+- Assume that the `results.csv` is present in the current working directory.  
+- Write your script in `grades.sh`.
+- It should be present in `~/se2001/nppe_3/` directory.
+- The script should output the result to the standard output (`&1`).
+````
+
+## File: nppe_4/evaluation_file.sh
+````bash
+#!/usr/bin/env bash
+if [[ ! -e employees.sed ]]; then
+  echo "employees.sed not found!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+sed -nf ./employees.sed 2>&1 
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+````
+
+## File: nppe_4/private_test_cases.txt
+````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+````
+
+## File: nppe_4/public/test_case_1/input.txt
+````
+Rahul, 30, Developer
+Emily, 25, Designer
+Amit, 28, Manager
+Sarah, 35, Developer
+James, 32, Designer
+````
+
+## File: nppe_4/public/test_case_1/output.txt
+````
+Rahul, Senior Developer
+Emily, Designer
+Amit, Manager
+Sarah, Senior Developer
+James, Designer
+````
+
+## File: nppe_4/public/test_case_2/input.txt
+````
+Michael, 40, Project Manager
+Anjali, 29, QA Engineer
+Rohit, 33, Developer
+George, 27, UX Designer
+Karan, 31, Data Analyst
+````
+
+## File: nppe_4/public/test_case_2/output.txt
+````
+Michael, Project Manager
+Anjali, QA Engineer
+Rohit, Senior Developer
+George, UX Designer
+Karan, Data Analyst
+````
+
+## File: nppe_4/README.md
+````markdown
+# NPPE Problem 4
+
+## Problem Statement
+
+Write a `sed` script named `employees.sed` to change the job title "Developer" to "Senior Developer", and remove age information from all records.
+
+## Sample Input
+
+```
+Rahul, 30, Developer
+Emily, 25, Designer
+Amit, 28, Manager
+Sarah, 35, Developer
+James, 32, Designer
+```
+
+## Sample Output
+
+```
+Rahul, Senior Developer
+Emily, Designer
+Amit, Manager
+Sarah, Senior Developer
+James, Designer
+```
+
+## Instructions
+
+- The script must be a `sed` script and not a bash script.
+- It should be present in `~/se2001/nppe_4/` directory.
+- Format the output strictly as shown in the example.
+- Your sed script is run as follows:
+
+```bash
+sed -nf employees.sed < inputfile
+```
+````
+
+## File: nppe_5/evaluation_file.sh
+````bash
+#!/usr/bin/env bash
+if [[ ! -e topper.awk ]]; then
+  echo "topper.awk not found!"
+  exit 1
+fi
+total_public_testcases=0
+passed_public_testcases=0
+cat >script.sh <<EOF
+#!/usr/bin/env bash
+gawk -nf ./topper.awk 2>&1 
+EOF
+chmod u+x script.sh
+while read -r test_case; do
+  echo "-> $test_case" >&2
+  [ -z "$test_case" ] && continue
+  if diff -u --color=always <(./script.sh < "$test_case/input.txt" | col) <( col < "$test_case/output.txt"); then
+    ((passed_public_testcases++))
+  fi
+  ((total_public_testcases++))
+done < <(find "/opt/se2001/$(basename "$PWD")/public" -type d -name "test_case*" | sort)
+echo "Public Testcases Passed: $passed_public_testcases/$total_public_testcases" >&2
+if [ "$passed_public_testcases" -ne "$total_public_testcases" ]; then
+    exit 1
+fi
+````
+
+## File: nppe_5/private_test_cases.txt
+````
+private/test_case_1
+private/test_case_2
+private/test_case_3
+private/test_case_4
+````
+
+## File: nppe_5/public/test_case_1/input.txt
+````
+Name	Math	Science English
+Maya	80	85	78
+Shreya	90	92	88
+Ananya	75	80	70
+Olivia	88	86	84
+Michael	82	79	85
+````
+
+## File: nppe_5/public/test_case_1/output.txt
+````
+Topper: Shreya
+````
+
+## File: nppe_5/README.md
+````markdown
+# NPPE Problem 5
+
+## Problem Statement
+
+You have a tab separated values (TSV) file that contains the scores of students in various subjects.
+
+Write an `awk` script named `topper.awk` that will calculate the average score for each student across all subjects.
+
+Assume that there are no ties in the average score.
+
+Identify the student with the highest average score and print their name.
+
+## **Sample Input**
+
+```tsv
+Name  Math  Science English
+Maya  80  85  78
+Shreya 90  92  88
+Ananya  75  80  70
+Olivia  88  86  84
+Michael 82  79  85
+```
+
+## **Sample Output**
+
+```txt
+Topper: Shreya
+```
+
+## Instructions
+
+- Your `awk` script should be saved in a file named `topper.awk`.
+- It should be present in `~/se2001/nppe_5/` directory.
+- Format the output strictly as shown in the example.
+- The awk script will be run as follows:
+
+```bash
+gawk -f topper.awk input-file
+```
+
+or
+
+```bash
+gawk -f topper.awk < input-file
+```
+````
+
+## File: README.md
+````markdown
+To be filled
+````
+
+## File: sample/evaluation_file.sh
+````bash
+#!/usr/bin/bash
+RANDOM_NUMBER=$RANDOM
+RANDOM_FILE=/tmp/$RANDOM_NUMBER
+echo hola > $RANDOM_FILE
+if [[ "$(./script.sh $RANDOM_FILE)" == "133ee989293f92736301280c6f14c89d521200c17dcdcecca30cd20705332d44" ]]; then
+        rm $RANDOM_FILE
+        exit 0
+else
+        rm $RANDOM_FILE
+        exit 1
+fi
+````
+
+## File: sample/hello.txt
+````
+hello world
+````
+
+## File: sample/private_test_cases.txt
+````
+private/test_case_1
+````
+
+## File: sample/README.md
+````markdown
+Welcome to the zeroth question. This assignment is not graded and provided with a solution file as a sample.
+
+**IMPORTANT**: execute `synchro eval` from the assignment directory (for this assignment `~/se2001/sample`) to record your submission for grading.
+
+# Sample (Not graded)
+Write a script `~/se2001/sample/script.sh` that takes a filename as argument and print only the hash value.
+
+# Verification (Not submission)
+Once you have written your script you can verify the same using the following command
+```
+~/se2001/sample/script.sh /opt/se2001/sample/hello.txt
+```
+
+The expected output should be
+```
+a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447
+```
+````
+
+## File: sample/script.sh
+````bash
+#!/usr/bin/bash
+sha256sum "$1" | cut -d" " -f1
+````
+`````
+
+## File: sample/evaluation_file.sh
+`````bash
+#!/usr/bin/bash
+RANDOM_NUMBER=$RANDOM
+RANDOM_FILE=/tmp/$RANDOM_NUMBER
+echo hola > $RANDOM_FILE
+if [[ "$(./script.sh $RANDOM_FILE)" == "133ee989293f92736301280c6f14c89d521200c17dcdcecca30cd20705332d44" ]]; then
+        rm $RANDOM_FILE
+        exit 0
+else
+        rm $RANDOM_FILE
+        exit 1
+fi
+`````
+
+## File: sample/hello.txt
+`````
+hello world
+`````
+
+## File: sample/private_test_cases.txt
+`````
+private/test_case_1
+`````
+
+## File: sample/README.md
+`````markdown
+Welcome to the zeroth question. This assignment is not graded and provided with a solution file as a sample.
+
+**IMPORTANT**: execute `synchro eval` from the assignment directory (for this assignment `~/se2001/sample`) to record your submission for grading.
+
+# Sample (Not graded)
+Write a script `~/se2001/sample/script.sh` that takes a filename as argument and print only the hash value.
+
+# Verification (Not submission)
+Once you have written your script you can verify the same using the following command
+```
+~/se2001/sample/script.sh /opt/se2001/sample/hello.txt
+```
+
+The expected output should be
+```
+a948904f2f0f479b8f8197694b30184b0d2ed1c1cd2a1ec0fb85d299a192a447
+```
+`````
+
+## File: sample/script.sh
+`````bash
+#!/usr/bin/bash
+sha256sum "$1" | cut -d" " -f1
+`````
