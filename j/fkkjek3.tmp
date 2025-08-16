@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+read n
+f1=1
+f2=1
+for ((i=1; i<=n; i++)); do
+  for ((j=1; j<=i; j++)); do
+    printf "%s" "$f1"
+    next_fib=$((f1 + f2))
+    f1=$f2
+    f2=$next_fib
+    [ "$j" -lt "$i" ] && printf " "
+  done
+  printf "\n"
+done

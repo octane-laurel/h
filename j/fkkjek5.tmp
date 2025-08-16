@@ -1,0 +1,15 @@
+BEGIN{FS=","; OFS=","}
+{
+  weekly_total = 0
+  for (i = 1; i <= NF; i++) {
+    weekly_total += $i
+    daily_total[i] += $i
+  }
+  print $0, weekly_total
+}
+END{
+  for (i = 1; i <= NF; i++) {
+    printf "%s%s", daily_total[i], (i==NF ? "" : OFS)
+  }
+  print ""
+}
